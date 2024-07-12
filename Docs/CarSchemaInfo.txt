@@ -1,0 +1,123 @@
+Certainly! To set up a Mongoose schema with relationships between schemas using primary and foreign keys, you can use MongoDB ObjectIDs. Here's how you can create schemas with relationships where each schema references the others as needed.
+
+### 1. Car Schema
+```javascript
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const carSchema = new Schema({
+  make: { type: String, required: true },
+  model: { type: String, required: true },
+  year: { type: Number, required: true },
+  bodyType: { type: String, required: true },
+  mileage: { type: Number, required: true },
+  vin: { type: String, required: true, unique: true },
+  condition: { type: String, required: true, enum: ['New', 'Used', 'Certified Pre-Owned'] },
+  engineType: { type: String, required: true },
+  transmission: { type: String, required: true, enum: ['Automatic', 'Manual'] },
+  drivetrain: { type: String, required: true, enum: ['FWD', 'RWD', 'AWD'] },
+  fuelType: { type: String, required: true, enum: ['Gasoline', 'Diesel', 'Hybrid', 'Electric'] },
+  exteriorColor: { type: String, required: true },
+  interiorColor: { type: String, required: true },
+  numberOfDoors: { type: Number, required: true },
+  numberOfSeats: { type: Number, required: true },
+  askingPrice: { type: Number, required: true },
+  negotiablePrice: { type: Boolean, required: false, default: false },
+  availabilityForTestDrive: { type: Boolean, required: false, default: true },
+  location: {
+    city: { type: String, required: true },
+    state: { type: String, required: true }
+  },
+  titleStatus: { type: String, required: true, enum: ['Clean', 'Salvage', 'Rebuilt'] },
+  currentCondition: { type: String, required: false },
+  warrantyInformation: { type: String, required: false },
+  reasonForSelling: { type: String, required: false }
+}, { timestamps: true });
+
+const Car = mongoose.model('Car', carSchema);
+
+module.exports = Car;
+```
+
+### 2. Feature Schema
+```javascript
+const featureSchema = new Schema({
+  car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
+  safetyFeatures: { type: [String], required: false },
+  entertainmentFeatures: { type: [String], required: false },
+  comfortFeatures: { type: [String], required: false },
+  convenienceFeatures: { type: [String], required: false }
+}, { timestamps: true });
+
+const Feature = mongoose.model('Feature', featureSchema);
+
+module.exports = Feature;
+```
+
+### 3. History Schema
+```javascript
+const historySchema = new Schema({
+  car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
+  accidentHistory: { type: String, required: false },
+  serviceHistory: { type: String, required: false },
+  ownershipHistory: { type: String, required: false }
+}, { timestamps: true });
+
+const History = mongoose.model('History', historySchema);
+
+module.exports = History;
+```
+
+### 4. Media Schema
+```javascript
+const mediaSchema = new Schema({
+  car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
+  photos: { type: [String], required: false },
+  video: { type: String, required: false }
+}, { timestamps: true });
+
+const Media = mongoose.model('Media', mediaSchema);
+
+module.exports = Media;
+```
+
+### 5. Seller Schema
+```javascript
+const sellerSchema = new Schema({
+  car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
+  sellerType: { type: String, required: true, enum: ['Private Owner', 'Dealer'] },
+  contactInformation: {
+    phoneNumber: { type: String, required: true },
+    emailAddress: { type: String, required: true }
+  },
+  preferredContactMethod: { type: String, required: false, enum: ['Phone', 'Email', 'Messaging'] }
+}, { timestamps: true });
+
+const Seller = mongoose.model('Seller', sellerSchema);
+
+module.exports = Seller;
+```
+
+### 6. Full Car Listing Schema
+Finally, create the main `CarListing` schema that references the other schemas using the ObjectIDs:
+
+```javascript
+const carListingSchema = new Schema({
+  car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
+  features: { type: Schema.Types.ObjectId, ref: 'Feature', required: false },
+  history: { type: Schema.Types.ObjectId, ref: 'History', required: false },
+  media: { type: Schema.Types.ObjectId, ref: 'Media', required: false },
+  seller: { type: Schema.Types.ObjectId, ref: 'Seller', required: true }
+}, { timestamps: true });
+
+const CarListing = mongoose.model('CarListing', carListingSchema);
+
+module.exports = CarListing;
+```
+
+### Explanation:
+- Each sub-schema references the `Car` schema via `car: { type: Schema.Types.ObjectId, ref: 'Car', required: true }`.
+- The `CarListing` schema brings everything together by referencing the `Car`, `Feature`, `History`, `Media`, and `Seller` schemas.
+- ObjectIDs (`Schema.Types.ObjectId`) are used to create relationships between the schemas.
+
+This approach keeps the data modular and related through references, enabling efficient querying and management.
