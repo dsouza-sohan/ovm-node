@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
-const User = require("../../Model/user");
-const passwordResetToken = require("../../Model/passwordReset");
+const User = require("../../Model/Auth/user");
+const passwordResetToken = require("../../Model/Auth/passwordReset");
 
 const sendEmail = require("../../Middleware/mailer");
 const angular_admin = process.env.ANGULAR_ADMIN
