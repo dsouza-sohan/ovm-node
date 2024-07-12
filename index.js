@@ -4,7 +4,7 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const mongoconnect = require('mongoose');
-require('dotenv/config');
+require('dotenv').config();
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 
@@ -31,10 +31,12 @@ parameterLimit: 100000,
 extended: true}))
 app.use(express.json({limit: '50mb'}))
 //Db connection
-mongoconnect.connect(process.env.DB_CONNECT,{
-    useNewUrlParser:true,useUnifiedTopology:true},()=>{
-        console.log('Mongodb Connected');
-})
+mongoconnect.connect(process.env.DB_CONNECT)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit the process with an error code
+  });
 
 
 //Routes imports
