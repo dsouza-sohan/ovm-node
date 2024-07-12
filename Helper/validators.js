@@ -5,7 +5,6 @@ function handleValidationError(err, res, consoleLog = false){
       consoleLog && console.log(err.errors[field].message)
     }
     return messages
-    // res.status(422).json({ messages })
 }
 
 module.exports = handleValidationError;
