@@ -3,7 +3,10 @@ const Schema = mongoose.Schema;
 
 const mediaSchema = new Schema({
     car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
-    photos: { type: [String], required: false },
+    photos: { 
+       contentType: String, 
+      filename: String
+    },
     video: { type: String, required: false }
   }, { timestamps: true });
   
