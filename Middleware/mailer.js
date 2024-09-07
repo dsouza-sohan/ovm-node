@@ -2,46 +2,57 @@ const express = require("express");
 const route = express.Router();
 const nodemailer = require("nodemailer");
 
-const angular_user = process.env.ANGULAR_USER
-const angular_admin = process.env.ANGULAR_ADMIN
+const angular_user = process.env.ANGULAR_USER;
+const angular_admin = process.env.ANGULAR_ADMIN;
 
-const transporter = nodemailer.createTransport({
-	port: 465,
-	host: "smtp.gmail.com",
-	auth: {
-		user: "vamore5996@gmail.com",
-		pass: "V@ibhavi511"
-	},
-	secure: true, // upgrades later with STARTTLS -- change this based on the PORT
+// const transporter = nodemailer.createTransport({
+// 	port: 465,
+// 	host: "smtp.gmail.com",
+// 	auth: {
+// 		user: "sohandsouza276@gmail.com",
+// 		pass: "FasTrack2997"
+// 	},
+// 	secure: true, // upgrades later with STARTTLS -- change this based on the PORT
+// });
+
+// Create a transporter object
+var transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "7e3551d2c579dd",
+    pass: "d7d81cbbda2439",
+  },
 });
 
 function sendEmail(status, body) {
-	const mailData = {
-		from: "vamore5996@gmail.com",
-		to: body.to,
-		subject: body.subject,
-		// text: text,
-		html: getTemplate(status, body),
-	};
+  const mailData = {
+    from: "sohandsouza276@gmail.com",
+    to: body.to,
+    subject: body.subject,
+    // text: text,
+    html: getTemplate(status, body),
+  };
 
-	transporter.sendMail(mailData, (error, info) => {
-		if (error) {
-			return error;
-		} else {
-			return info;
-		}
-		// res.status(200).send({ message: "Mail send", message_id: info.messageId });
-	});
+  transporter.sendMail(mailData, (error, info) => {
+    if (error) {
+      return error;
+    } else {
+      return info;
+    }
+    // res.status(200).send({ message: "Mail send", message_id: info.messageId });
+  });
 }
 
 function getTemplate(template, body) {
-	if (template == "welcome") {
-		const welcomeEmail = `
+  if (template == "welcome") {
+    const welcomeEmail =
+      `
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-            <title>Hand 2 Hand</title>
+            <title>Online Vehicle Marketplace</title>
         
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         
@@ -91,7 +102,11 @@ function getTemplate(template, body) {
                                                 <!-- Main Title -->
                                                 <tr>
                                                     <td colspan="3" height="60" align="center">
-                                                        <div border="0" style="border: none; line-height: 60px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; font-size: 52px; text-transform: uppercase; font-weight: bolder;">HELLO `+body.firstname+' '+body.lastname+`, </div>
+                                                        <div border="0" style="border: none; line-height: 60px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; font-size: 52px; text-transform: uppercase; font-weight: bolder;">HELLO ` +
+      body.firstname +
+      " " +
+      body.lastname +
+      `, </div>
                                                     </td>
                                                 </tr>
                                                 <!-- Line 1 -->
@@ -126,7 +141,9 @@ function getTemplate(template, body) {
                                                     <!-- Button Start -->
                                                     <td width="300" align="center" height="52">
                                                         <div style="background-image: url(https://github.com/lime7/responsive-html-template/blob/master/index/intro__btn.png?raw=true); background-size: 100% 100%; background-position: center center; width: 225px;">
-                                                            <a  href="`+angular_user+`" width="160" height="52" border="0" bgcolor="#009789" style="border: none; outline: none; display: block; width:160px; height: 52px; text-transform: uppercase; text-decoration: none; font-size: 17px; line-height: 52px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; text-align: center; background-color: #009789;  -webkit-text-size-adjust:none;">
+                                                            <a  href="` +
+      angular_user +
+      `" width="160" height="52" border="0" bgcolor="#009789" style="border: none; outline: none; display: block; width:160px; height: 52px; text-transform: uppercase; text-decoration: none; font-size: 17px; line-height: 52px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; text-align: center; background-color: #009789;  -webkit-text-size-adjust:none;">
                                                                 Visit now
                                                             </a>
                                                         </div>
@@ -149,10 +166,11 @@ function getTemplate(template, body) {
         </body>
         
         </html>`;
-		return welcomeEmail;
-	} else if (template == "post") {
-        console.log("came inside email template");
-		const postEmail = `
+    return welcomeEmail;
+  } else if (template == "post") {
+    console.log("came inside email template");
+    const postEmail =
+      `
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -242,7 +260,11 @@ function getTemplate(template, body) {
                                                     <!-- Button Start -->
                                                     <td width="300" align="center" height="52">
                                                         <div style="background-image: url(https://github.com/lime7/responsive-html-template/blob/master/index/intro__btn.png?raw=true); background-size: 100% 100%; background-position: center center; width: 225px;">
-                                                            <a href="`+angular_admin+`post/post-view/`+body.postId+`" width="160" height="52" border="0" bgcolor="#009789" style="border: none; outline: none; display: block; width:160px; height: 52px; text-transform: uppercase; text-decoration: none; font-size: 17px; line-height: 52px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; text-align: center; background-color: #009789;  -webkit-text-size-adjust:none;">
+                                                            <a href="` +
+      angular_admin +
+      `post/post-view/` +
+      body.postId +
+      `" width="160" height="52" border="0" bgcolor="#009789" style="border: none; outline: none; display: block; width:160px; height: 52px; text-transform: uppercase; text-decoration: none; font-size: 17px; line-height: 52px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; text-align: center; background-color: #009789;  -webkit-text-size-adjust:none;">
                                                                 Go to Post
                                                             </a>
                                                         </div>
@@ -265,9 +287,10 @@ function getTemplate(template, body) {
         </body>
         
         </html>`;
-        return postEmail;
-	} else if(template == 'donation') {
-        const DonorEmail = `<html lang="en">
+    return postEmail;
+  } else if (template == "donation") {
+    const DonorEmail =
+      `<html lang="en">
 
         <head>
           <meta charset="UTF-8">
@@ -390,28 +413,36 @@ function getTemplate(template, body) {
                               <tr>
                                 <td style="color:white;margin-left:30px">
                                   Requested By: </td>
-                                <td style="color:white;margin-left:30px"> `+body.requestName+`
+                                <td style="color:white;margin-left:30px"> ` +
+      body.requestName +
+      `
                                 </td>
         
                               </tr>
                               <tr>
                                 <td style="color:white">
                                   Requestor Email: </td>
-                                <td style="color:white;margin-left:30px"> `+body.requestEmail+`
+                                <td style="color:white;margin-left:30px"> ` +
+      body.requestEmail +
+      `
                                 </td>
         
                               </tr>
                               <tr>
                                 <td style="color:white">
                                   Requestor Phone: </td>
-                                <td style="color:white;margin-left:30px"> `+body.requestPhone+`
+                                <td style="color:white;margin-left:30px"> ` +
+      body.requestPhone +
+      `
                                 </td>
         
                               </tr>
                               <tr>
                                 <td style="color:white">
                                   Request Details: </td>
-                                <td style="color:white;margin-left:30px"> `+body.requestDetails+`
+                                <td style="color:white;margin-left:30px"> ` +
+      body.requestDetails +
+      `
                                 </td>
         
                               </tr>
@@ -434,9 +465,10 @@ function getTemplate(template, body) {
         </body>
         
         </html>`;
-        return DonorEmail;
-    } else if(template == 'donationRequest') {
-        const requestorEmail = `<html lang="en">
+    return DonorEmail;
+  } else if (template == "donationRequest") {
+    const requestorEmail =
+      `<html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -490,7 +522,9 @@ function getTemplate(template, body) {
                                                 <!-- Main Title -->
                                                 <tr>
                                                     <td colspan="3" height="60" align="center">
-                                                        <div border="0" style="border: none; line-height: 60px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; font-size: 52px; text-transform: uppercase; font-weight: bolder;">HELLO `+body.name+`!</div>
+                                                        <div border="0" style="border: none; line-height: 60px; color: #ffffff; font-family: Verdana, Geneva, sans-serif; font-size: 52px; text-transform: uppercase; font-weight: bolder;">HELLO ` +
+      body.name +
+      `!</div>
                                                     </td>
                                                 </tr>
                                                 <!-- Line 1 -->
@@ -542,12 +576,12 @@ function getTemplate(template, body) {
         </body>
         
         </html>`;
-        return requestorEmail;
-    } else if(template == 'newsletter') {
-        console.log("body");
-        console.log(body);
-        return body.body;
-    }
+    return requestorEmail;
+  } else if (template == "newsletter") {
+    console.log("body");
+    console.log(body);
+    return body.body;
+  }
 }
 
 module.exports = sendEmail;
