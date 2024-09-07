@@ -24,9 +24,9 @@ var corsOptionsDelegate = function (req, callback) {
 
 //Package middleware
 app.use(cors(corsOptionsDelegate));
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
+// app.use(bodyParser.json({ limit: '50mb' }));
+// app.use(bodyParser.urlencoded());
+// app.use(bodyParser.json());
 app.use(express.urlencoded({
   limit: '50mb',
   parameterLimit: 100000,
@@ -47,21 +47,21 @@ const registerRoute = require('./Routes/Auth/registration');
 const loginRoute = require('./Routes/Auth/login');
 const passwordRoute = require('./Routes/Auth/password');
 const carRoute = require('./Routes/Car/car');
-const mediaRoute = require('./Routes/Car/media');
+// const mediaRoute = require('./Routes/Car/media');
 
 //Route middleware
 app.use('/auth', registerRoute)
 app.use('/login', loginRoute)
 app.use('/password', passwordRoute)
 app.use('/cars', carRoute)
-app.use('/media', mediaRoute)
+// app.use('/media', mediaRoute)
 
 
 
 
 //These is used to allow access to the images folder
-app.use('/public', express.static('public'));
-app.use('/images', express.static('images'));
+// app.use('/public', express.static('public'));
+// app.use('/images', express.static('images'));
 
 //Server poor
 app.listen(port, () => {
