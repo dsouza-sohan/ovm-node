@@ -1,4 +1,4 @@
-const express=require('express');
+const express = require('express');
 const app = express();
 
 
@@ -24,13 +24,15 @@ var corsOptionsDelegate = function (req, callback) {
 
 //Package middleware
 app.use(cors(corsOptionsDelegate));
-// app.use(bodyParser.json({limit: '50mb'}));
-// app.use(bodyParser.urlencoded());
-// app.use(bodyParser.json());
-app.use(express.urlencoded({limit: '50mb',
-parameterLimit: 100000,
-extended: true}))
-app.use(express.json({limit: '50mb'}))
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
+app.use(express.urlencoded({
+  limit: '50mb',
+  parameterLimit: 100000,
+  extended: true
+}))
+app.use(express.json({ limit: '50mb' }))
 //Db connection
 mongoconnect.connect(process.env.DB_CONNECT)
   .then(() => console.log('MongoDB connected'))
@@ -48,20 +50,20 @@ const carRoute = require('./Routes/Car/car');
 const mediaRoute = require('./Routes/Car/media');
 
 //Route middleware
-app.use('/auth',registerRoute)
-app.use('/login',loginRoute)
-app.use('/password',passwordRoute)
-app.use('/cars',carRoute)
-app.use('/media',mediaRoute)
+app.use('/auth', registerRoute)
+app.use('/login', loginRoute)
+app.use('/password', passwordRoute)
+app.use('/cars', carRoute)
+app.use('/media', mediaRoute)
 
 
 
 
 //These is used to allow access to the images folder
-app.use('/public',express.static('public'));  
-app.use('/images', express.static('images')); 
+app.use('/public', express.static('public'));
+app.use('/images', express.static('images'));
 
 //Server poor
-app.listen(port,()=>{
-    console.log('Port running at 3000');
+app.listen(port, () => {
+  console.log('Port running at 3000');
 })

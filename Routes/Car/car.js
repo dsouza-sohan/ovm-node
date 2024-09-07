@@ -43,7 +43,7 @@ router.post('/cars', async (req, res) => {
 });
 
 // Get all car listings with pagination
-app.get('/cars', async (req, res) => {
+router.get('/cars', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1; // Current page number, default is 1
         const limit = parseInt(req.query.limit) || 10; // Number of items per page, default is 10
