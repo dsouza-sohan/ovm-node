@@ -58,6 +58,7 @@ const cartRoute = require("./Routes/User/cart");
 const wishlistRoute = require("./Routes/User/wishlist");
 const biddingRoute = require("./Routes/Bidding/bidding");
 const orderRoute = require("./Routes/Order/order");
+const searchRoute = require("./Routes/Advancesearch/search");
 // const mediaRoute = require('./Routes/Car/media');
 
 //Route middleware
@@ -70,6 +71,7 @@ app.use("/cart", cartRoute);
 app.use("/wishlist", wishlistRoute);
 app.use("/bidding", biddingRoute);
 app.use("/order", orderRoute);
+app.use("/search", searchRoute);
 // app.use('/media', mediaRoute)
 
 //These is used to allow access to the images folder

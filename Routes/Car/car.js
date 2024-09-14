@@ -6,6 +6,7 @@ const VehicleSummary = require("../../Model/Car/vehicleSummary");
 const VehicleTechSpecs = require("../../Model/Car/vehicleTechSpecs");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 const Bidding = require("../../Model/Bidding/bidding");
+const elasticClient = require("../../elastic");
 
 router.post("/", validateToken, async (req, res) => {
   try {
@@ -76,8 +77,32 @@ router.post("/", validateToken, async (req, res) => {
       vehicleStandardEquipment: vehicleStandardEquipmentResponse?._id,
       isBiddable: req.body.isBiddable,
       price: req.body.price,
+      marketType: req.body.marketType,
     });
     var response = await car.save();
+
+    await elasticClient.index({
+      index: "post",
+      document: {
+        owner: req.decoded._id,
+        brand: req.body.brand,
+        model: req.body.model,
+        year: req.body.year,
+        vehicleSummary: vehicleSummaryResponse,
+        mileage: req.body.mileage,
+        fuelEconomy: req.body.fuelEconomy,
+        ulez: req.body.ulez,
+        vehicleDescription: req.body.vehicleDescription,
+        vehicleStats: req.body.vehicleStats,
+        vehicleFeatures: req.body.vehicleFeatures,
+        address: req.body.address,
+        vehicleTechSpecs: vehicleTechSpecsResponse,
+        vehicleStandardEquipment: vehicleStandardEquipmentResponse,
+        isBiddable: req.body.isBiddable,
+        price: req.body.price,
+        marketType: req.body.marketType,
+      },
+    });
 
     return res.status(200).json({
       code: 200,
@@ -277,6 +302,7 @@ router.patch("/:id", validateToken, async (req, res) => {
     if (req.body.address) car.address = req.body.address;
     if (req.body.isBiddable) car.isBiddable = req.body.isBiddable;
     if (req.body.price) car.price = req.body.price;
+    if (req.body.marketType) car.markeType = req.body.marketType;
 
     // Save the updated car
     const updatedCar = await car.save();

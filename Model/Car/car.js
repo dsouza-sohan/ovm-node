@@ -38,6 +38,7 @@ const carSchema = new Schema(
     isActive: { type: Boolean, default: false },
     isBiddable: { type: Boolean, default: false },
     price: { type: Number, required: true },
+    marketType: { type: [String], enum: ["Featured", "Popular"] },
   },
   { timestamps: true }
 );
