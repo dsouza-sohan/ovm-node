@@ -32,6 +32,7 @@ const carSchema = new Schema(
     },
     status: { type: String, enum: ["Pending", "Approved"], default: "Pending" },
     isActive: { type: Boolean, default: false },
+    isBiddable: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
