@@ -47,6 +47,7 @@ const registerRoute = require('./Routes/Auth/registration');
 const loginRoute = require('./Routes/Auth/login');
 const passwordRoute = require('./Routes/Auth/password');
 const carRoute = require('./Routes/Car/car');
+const userRoute = require('./Routes/User/user');
 // const mediaRoute = require('./Routes/Car/media');
 
 //Route middleware
@@ -54,6 +55,7 @@ app.use('/auth', registerRoute)
 app.use('/login', loginRoute)
 app.use('/password', passwordRoute)
 app.use('/cars', carRoute)
+app.use('/user',userRoute)
 // app.use('/media', mediaRoute)
 
 

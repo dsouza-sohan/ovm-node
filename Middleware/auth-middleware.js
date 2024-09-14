@@ -6,10 +6,6 @@ module.exports = {
       let result;
       if (authorizationHeaader) {
         const token = req.headers.authorization.split(' ')[1]; // Bearer <token>
-        const options = {
-          expiresIn: '2d',
-          issuer: 'https://scotch.io' 
-        };
         try {
           // verify makes sure that the token hasn't expired and has been issued by us
           result = jwttoken.verify(token, process.env.TOKEN_SECRET);
@@ -20,7 +16,13 @@ module.exports = {
           next();
         } catch (err) {
           // Throw an error just in case anything goes wrong with verification
-          throw new Error(err);
+          // throw new Error(err);
+          result = { 
+            message: err,
+            code: 401,
+            data:null
+          };
+          return res.status(401).send(result);
         }
       } else {
         result = { 
@@ -28,7 +30,7 @@ module.exports = {
           code: 401,
           data:null
         };
-        res.status(401).send(result);
+        return res.status(401).send(result);
       }
     }
   };
