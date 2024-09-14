@@ -1,35 +1,41 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const carSchema = new Schema({
-  make: { type: String, required: true },
-  model: { type: String, required: true },
-  year: { type: Number, required: true },
-  bodyType: { type: String, required: true },
-  mileage: { type: Number, required: true },
-  vin: { type: String, required: true, unique: true },
-  condition: { type: String, required: true, enum: ['New', 'Used', 'Certified Pre-Owned'] },
-  engineType: { type: String, required: true },
-  transmission: { type: String, required: true, enum: ['Automatic', 'Manual'] },
-  drivetrain: { type: String, required: true, enum: ['FWD', 'RWD', 'AWD'] },
-  fuelType: { type: String, required: true, enum: ['Gasoline', 'Diesel', 'Hybrid', 'Electric'] },
-  exteriorColor: { type: String, required: true },
-  interiorColor: { type: String, required: true },
-  numberOfDoors: { type: Number, required: true },
-  numberOfSeats: { type: Number, required: true },
-  askingPrice: { type: Number, required: true },
-  negotiablePrice: { type: Boolean, required: false, default: false },
-  availabilityForTestDrive: { type: Boolean, required: false, default: true },
-  location: {
-    city: { type: String, required: true },
-    state: { type: String, required: true }
+const carSchema = new Schema(
+  {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    brand: { type: String, required: true },
+    model: { type: String, required: true },
+    year: { type: Number, required: true },
+    vehicleSummary: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "VehicleSummary",
+    },
+    mileage: { type: Number, required: true },
+    fuelEconomy: { type: Number, required: true },
+    ulez: { type: String, required: true, enum: ["Yes", "No"] },
+    vehicleDescription: { type: String },
+    vehicleStats: { type: String },
+    vehicleFeatures: { type: String },
+    address: { type: Object, required: true },
+    vehicleTechSpecs: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "VehicleTechSpecs",
+    },
+    vehicleStandardEquipment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "VehicleStandardEquipment",
+    },
+    status: { type: String, enum: ["Pending", "Approved"], default: "Pending" },
+    isActive: { type: Boolean, default: false },
   },
-  titleStatus: { type: String, required: true, enum: ['Clean', 'Salvage', 'Rebuilt'] },
-  currentCondition: { type: String, required: false },
-  warrantyInformation: { type: String, required: false },
-  reasonForSelling: { type: String, required: false }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-const Car = mongoose.model('Car', carSchema);
+const Car = mongoose.model("Car", carSchema);
 
 module.exports = Car;
