@@ -30,9 +30,14 @@ const carSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "VehicleStandardEquipment",
     },
-    status: { type: String, enum: ["Pending", "Approved"], default: "Pending" },
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Sold"],
+      default: "Pending",
+    },
     isActive: { type: Boolean, default: false },
     isBiddable: { type: Boolean, default: false },
+    price: { type: Number, required: true },
   },
   { timestamps: true }
 );

@@ -5,6 +5,7 @@ const VehicleStandardEquipment = require("../../Model/Car/vehicleStandardEquipme
 const VehicleSummary = require("../../Model/Car/vehicleSummary");
 const VehicleTechSpecs = require("../../Model/Car/vehicleTechSpecs");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
+const Bidding = require("../../Model/Bidding/bidding");
 
 router.post("/", validateToken, async (req, res) => {
   try {
@@ -74,6 +75,7 @@ router.post("/", validateToken, async (req, res) => {
       vehicleTechSpecs: vehicleTechSpecsResponse?._id,
       vehicleStandardEquipment: vehicleStandardEquipmentResponse?._id,
       isBiddable: req.body.isBiddable,
+      price: req.body.price,
     });
     var response = await car.save();
 
@@ -103,9 +105,18 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const car = await Car.find().populate(
-      "owner vehicleSummary vehicleTechSpecs vehicleStandardEquipment"
-    );
+    const car = await Car.find()
+      .populate(
+        "owner vehicleSummary vehicleTechSpecs vehicleStandardEquipment"
+      )
+      .lean(); // Convert to plain JavaScript objects for easier manipulation
+
+    // Fetch all biddings for each car
+    for (const c of car) {
+      const biddings = await Bidding.find({ car: c._id }).populate("user");
+      c.biddings = biddings; // Attach biddings to the car object
+    }
+
     res.status(200).json({
       code: 200,
       message: "Car list fetched successfully",
@@ -125,9 +136,22 @@ router.get("/", async (req, res) => {
 //get Car by id
 router.get("/:carId", async (req, res) => {
   try {
-    const car = await Car.findById(req.params.carId).populate(
-      "owner vehicleSummary vehicleTechSpecs vehicleStandardEquipment"
-    );
+    const car = await Car.findById(req.params.carId)
+      .populate(
+        "owner vehicleSummary vehicleTechSpecs vehicleStandardEquipment"
+      )
+      .lean();
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    // Find all biddings related to this car
+    const biddings = await Bidding.find({ car: car._id }).populate("user");
+
+    // Attach the biddings to the car object
+    car["biddings"] = biddings;
+
     res.status(200).json({
       code: 200,
       message: "Car list fetched successfully",
@@ -251,6 +275,8 @@ router.patch("/:id", validateToken, async (req, res) => {
     if (req.body.vehicleFeatures)
       car.vehicleFeatures = req.body.vehicleFeatures;
     if (req.body.address) car.address = req.body.address;
+    if (req.body.isBiddable) car.isBiddable = req.body.isBiddable;
+    if (req.body.price) car.price = req.body.price;
 
     // Save the updated car
     const updatedCar = await car.save();
