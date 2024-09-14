@@ -13,6 +13,7 @@ const biddingSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  isAccepted: { type: Boolean, default: false },
 });
 
 const Bidding = mongoose.model("Bidding", biddingSchema);

@@ -126,4 +126,36 @@ router.get("/seller", validateToken, async (req, res) => {
   }
 });
 
+// accept bid
+router.patch("/accept/:id", validateToken, async (req, res) => {
+  try {
+    const bidId = req.params.id;
+
+    // Update only the isAccepted field
+    const updatedBid = await Bidding.findByIdAndUpdate(
+      bidId,
+      { $set: { isAccepted: req.body.isAccepted } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBid) {
+      return res.status(404).json({ message: "Car not found", status: false });
+    }
+
+    return res.status(200).json({
+      code: 200,
+      message: "Bid approved successfully!",
+      data: updatedBid,
+      status: true,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+      status: false,
+      code: 500,
+      data: null,
+    });
+  }
+});
+
 module.exports = router;
