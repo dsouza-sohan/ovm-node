@@ -62,7 +62,7 @@ router.post("/", validateToken, async (req, res) => {
 
     //Save car
     const car = new Car({
-      owner: req.body.user_id,
+      owner: req.body.owner,
       brand: req.body.brand,
       model: req.body.model,
       year: req.body.year,
@@ -80,12 +80,13 @@ router.post("/", validateToken, async (req, res) => {
       price: req.body.price,
       marketType: req.body.marketType,
     });
+    console.log(req.body.address);
     var response = await car.save();
 
     await elasticClient.index({
       index: "post",
       document: {
-        owner: req.body.user_id,
+        owner: req.body.owner,
         brand: req.body.brand,
         model: req.body.model,
         year: req.body.year,

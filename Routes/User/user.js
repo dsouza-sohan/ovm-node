@@ -3,6 +3,7 @@ const router = express.Router();
 
 //User schema import
 const User = require("../../Model/Auth/user");
+const Car = require("../../Model/Car/car");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 const { uploadFile, deleteFile } = require("../../Middleware/box-upload");
 
@@ -57,7 +58,13 @@ router.get("/", async (req, res) => {
 //get indiviual user details
 router.get("/:userId", async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId).lean();
+
+    const cars = await Car.find({ owner: req.params.userId });
+    console.log(cars);
+    if (cars) {
+      user.my_cars = cars;
+    }
     res.status(200).json({
       code: 200,
       message: "User fetched successfully",
@@ -112,6 +119,7 @@ router.patch("/:userId", async (req, res) => {
         },
       }
     );
+
     res.status(200).json({
       code: 200,
       message: "User updated successfully",
