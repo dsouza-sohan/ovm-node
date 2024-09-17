@@ -4,10 +4,10 @@ const Orders = require("../../Model/Order/order");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 const mongoose = require("mongoose");
 
-router.post("/:id", validateToken, async (req, res) => {
+router.post("/:id/:userId", validateToken, async (req, res) => {
   const order = new Orders({
     car: req.params.id,
-    user: req.decoded._id,
+    user: req.params.userId,
     paymentDetails: req.body.paymentDetails,
   });
 
@@ -31,9 +31,9 @@ router.post("/:id", validateToken, async (req, res) => {
 });
 
 // Get user order detials
-router.get("/", validateToken, async (req, res) => {
+router.get("/:userId", validateToken, async (req, res) => {
   try {
-    var response = await Orders.find({ user: req.decoded._id })
+    var response = await Orders.find({ user: req.params.userId })
       .populate({
         path: "car",
         populate: [
@@ -62,12 +62,12 @@ router.get("/", validateToken, async (req, res) => {
 });
 
 // Get user order details items by seller
-router.get("/seller", validateToken, async (req, res) => {
+router.get("/seller/:userId", validateToken, async (req, res) => {
   try {
     const response = await Orders.find()
       .populate({
         path: "car",
-        match: { owner: new mongoose.Types.ObjectId(req.decoded._id) },
+        match: { owner: new mongoose.Types.ObjectId(req.params.userId) },
         populate: [
           { path: "vehicleSummary" },
           { path: "vehicleTechSpecs" },

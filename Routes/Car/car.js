@@ -7,6 +7,7 @@ const VehicleTechSpecs = require("../../Model/Car/vehicleTechSpecs");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 const Bidding = require("../../Model/Bidding/bidding");
 const elasticClient = require("../../elastic");
+const axios = require("axios");
 
 router.post("/", validateToken, async (req, res) => {
   try {
@@ -61,7 +62,7 @@ router.post("/", validateToken, async (req, res) => {
 
     //Save car
     const car = new Car({
-      owner: req.decoded._id,
+      owner: req.body.user_id,
       brand: req.body.brand,
       model: req.body.model,
       year: req.body.year,
@@ -84,7 +85,7 @@ router.post("/", validateToken, async (req, res) => {
     await elasticClient.index({
       index: "post",
       document: {
-        owner: req.decoded._id,
+        owner: req.body.user_id,
         brand: req.body.brand,
         model: req.body.model,
         year: req.body.year,
@@ -130,7 +131,60 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const car = await Car.find()
+    const {
+      carType,
+      marketType,
+      brand,
+      model,
+      isBiddable,
+      minPrice,
+      maxPrice,
+      status,
+    } = req.query;
+    var vehicleSummaryIds = [];
+    // car type
+    if (carType) {
+      // Find vehicle summaries that match the carType
+      const vehicleSummaries = await VehicleSummary.find({ carType });
+
+      // Extract the IDs of the matching vehicle summaries
+      vehicleSummaryIds = vehicleSummaries.map((summary) => summary._id) ?? [];
+      console.log(vehicleSummaryIds);
+    }
+
+    // Build the query object
+    const query = {};
+    if (carType) {
+      query.vehicleSummary = { $in: vehicleSummaryIds };
+    }
+
+    if (marketType) {
+      query.marketType = { $in: [marketType] };
+    }
+
+    if (brand) {
+      query.brand = { $in: brand };
+    }
+
+    if (model) {
+      query.model = { $in: model };
+    }
+
+    if (isBiddable) {
+      query.isBiddable = { $in: isBiddable };
+    }
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = parseFloat(minPrice);
+      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+    }
+
+    if (status) {
+      query.status = { status };
+    }
+
+    const car = await Car.find(query)
       .populate(
         "owner vehicleSummary vehicleTechSpecs vehicleStandardEquipment"
       )
@@ -149,6 +203,7 @@ router.get("/", async (req, res) => {
       status: true,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       code: 500,
       message: error,
@@ -357,6 +412,31 @@ router.patch("/:id/status", validateToken, async (req, res) => {
       status: false,
       code: 500,
       data: null,
+    });
+  }
+});
+
+//get Car by id
+router.get("/brand/model", async (req, res) => {
+  try {
+    const apiResponse = await axios.get(
+      "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/all-vehicles-model/records?limit=100"
+    );
+    console.log(apiResponse.data);
+
+    res.status(200).json({
+      code: 200,
+      message: "Car list fetched successfully",
+      data: apiResponse.data,
+      status: true,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      code: 500,
+      message: error,
+      data: null,
+      status: false,
     });
   }
 });

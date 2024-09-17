@@ -3,10 +3,10 @@ const router = express.Router();
 const Cart = require("../../Model/Cart/cart");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 
-router.post("/:id", validateToken, async (req, res) => {
+router.post("/:id/:userId", validateToken, async (req, res) => {
   const cart = new Cart({
     car: req.params.id,
-    user: req.decoded._id,
+    user: req.params.userId,
   });
 
   try {
@@ -49,9 +49,9 @@ router.delete("/:id", validateToken, async (req, res) => {
 });
 
 // Get user cart items
-router.get("/", validateToken, async (req, res) => {
+router.get("/:userId", validateToken, async (req, res) => {
   try {
-    var response = await Cart.find({ user: req.decoded._id })
+    var response = await Cart.find({ user: req.params.userId })
       .populate({
         path: "car",
         populate: [

@@ -3,10 +3,10 @@ const router = express.Router();
 const Wishlist = require("../../Model/Wishlist/wishlist");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 
-router.post("/:id", validateToken, async (req, res) => {
+router.post("/:id/:userId", validateToken, async (req, res) => {
   const wishlist = new Wishlist({
     car: req.params.id,
-    user: req.decoded._id,
+    user: req.params.userId,
   });
 
   try {
@@ -49,9 +49,9 @@ router.delete("/:id", validateToken, async (req, res) => {
 });
 
 // Get user Wishlist items
-router.get("/", validateToken, async (req, res) => {
+router.get("/:userId", validateToken, async (req, res) => {
   try {
-    var response = await Wishlist.find({ user: req.decoded._id })
+    var response = await Wishlist.find({ user: req.params.userId })
       .populate({
         path: "car",
         populate: [

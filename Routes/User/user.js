@@ -27,6 +27,17 @@ router.get("/", async (req, res) => {
 
   try {
     const user = await User.find(matchCondition);
+    const ProfileImage = mongoose.model("profile_images", profieSchema);
+    var Images = await ProfileImage.find();
+
+    Images.map((res) => {
+      user.map((res1) => {
+        if (res1.user_id === res.user_id) {
+          res1.profile_image = res;
+        }
+        return res1;
+      });
+    });
     res.status(200).json({
       code: 200,
       message: "User list fetched successfully",
@@ -124,29 +135,36 @@ router.post(
   upload.single("image"),
   async (req, res) => {
     try {
-      console.log(req.file);
+      console.log(req.decoded);
       const img_name_parts = req.file.originalname.split(".");
       const img_type = img_name_parts[img_name_parts.length - 1];
       const uploadedData = await uploadFile({
         fileContents: req.file.buffer,
-        user_id: req.decoded._id,
+        user_id: req.body.user_id,
         doc_name: img_name_parts[0],
         doc_id: req.body.image_id,
         doc_type: img_type,
       });
-      console.log("uploadedData", uploadedData);
+      // console.log("uploadedData", uploadedData);
       const ProfileImage = mongoose.model("profile_images", profieSchema);
       const profile_image = new ProfileImage({
         image: uploadedData.shared_link.download_url,
         image_id: uploadedData.id,
-        user_id: req.decoded._id,
+        user_id: req.body.user_id,
       });
-      var prevImage = await ProfileImage.find({ user_id: req.decoded._id });
+      var prevImage = await ProfileImage.find({ user_id: req.body.user_id });
       if (prevImage.length > 0) {
-        await ProfileImage.deleteMany({ user_id: req.decoded._id });
+        await ProfileImage.deleteMany({ user_id: req.body.user_id });
       }
 
       var response = await profile_image.save();
+
+      await User.findByIdAndUpdate(
+        req.body.user_id,
+        { $set: { profImage: uploadedData.shared_link.download_url } },
+        { new: true, runValidators: true }
+      );
+
       return res.status(200).json({
         code: 200,
         message: "Profile image added successfully..!",
