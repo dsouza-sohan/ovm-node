@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Car = require("../../Model/Car/car");
+const Cart = require("../../Model/Cart/cart");
+const Wishlist = require("../../Model/Wishlist/wishlist");
 const VehicleStandardEquipment = require("../../Model/Car/vehicleStandardEquipment");
 const VehicleSummary = require("../../Model/Car/vehicleSummary");
 const VehicleTechSpecs = require("../../Model/Car/vehicleTechSpecs");
@@ -8,6 +10,7 @@ const validateToken = require("../../Middleware/auth-middleware").validateToken;
 const Bidding = require("../../Model/Bidding/bidding");
 const elasticClient = require("../../elastic");
 const axios = require("axios");
+const mongoose = require("mongoose");
 
 router.post("/", validateToken, async (req, res) => {
   try {
@@ -215,7 +218,7 @@ router.get("/", async (req, res) => {
 });
 
 //get Car by id
-router.get("/:carId", async (req, res) => {
+router.get("/:carId/:userId?", async (req, res) => {
   try {
     const car = await Car.findById(req.params.carId)
       .populate(
@@ -233,6 +236,34 @@ router.get("/:carId", async (req, res) => {
     // Attach the biddings to the car object
     car["biddings"] = biddings;
 
+    const recommended = await Car.find({ brand: car.brand })
+      .populate(
+        "owner vehicleSummary vehicleTechSpecs vehicleStandardEquipment"
+      )
+      .lean();
+
+    if (req.params.userId) {
+      // check if in cart
+      car["cart"] = await Cart.find({
+        car: new mongoose.Types.ObjectId(car._id),
+        user: new mongoose.Types.ObjectId(req.params.userId),
+      });
+    }
+
+    if (req.params.userId) {
+      // check if in cart
+      car["wishlist"] = await Wishlist.find({
+        car: new mongoose.Types.ObjectId(car._id),
+        user: new mongoose.Types.ObjectId(req.params.userId),
+      });
+    }
+
+    if (recommended) {
+      car["recommended"] = recommended.filter(
+        (res) => res._id.toString() !== req.params.carId
+      );
+    }
+
     res.status(200).json({
       code: 200,
       message: "Car list fetched successfully",
@@ -240,6 +271,7 @@ router.get("/:carId", async (req, res) => {
       status: true,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       code: 500,
       message: error,
@@ -418,7 +450,7 @@ router.patch("/:id/status", validateToken, async (req, res) => {
 });
 
 //get Car by id
-router.get("/brand/model", async (req, res) => {
+router.get("/brand/model/search", async (req, res) => {
   try {
     const apiResponse = await axios.get(
       "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/all-vehicles-model/records?limit=100"

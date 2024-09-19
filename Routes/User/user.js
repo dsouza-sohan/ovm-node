@@ -4,6 +4,7 @@ const router = express.Router();
 //User schema import
 const User = require("../../Model/Auth/user");
 const Car = require("../../Model/Car/car");
+const Bidding = require("../../Model/Bidding/bidding");
 const validateToken = require("../../Middleware/auth-middleware").validateToken;
 const { uploadFile, deleteFile } = require("../../Middleware/box-upload");
 
@@ -65,6 +66,14 @@ router.get("/:userId", async (req, res) => {
     if (cars) {
       user.my_cars = cars;
     }
+
+    const bidding = await Bidding.find({ user: req.params.userId }).populate(
+      "car"
+    );
+    if (bidding) {
+      user.bidding = bidding;
+    }
+
     res.status(200).json({
       code: 200,
       message: "User fetched successfully",
